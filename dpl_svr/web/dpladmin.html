@@ -1,0 +1,190 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Dopple Demo Management</title>
+
+<!-- Third Party CSS file includes -- -->
+<link rel="stylesheet" href="core/js/tp/css/jquery-ui-1.10.3.custom.min.css" />
+<link rel="stylesheet" href="core/js/tp/css/jquery-ui-timepicker-addon.css" />
+
+<!-- -- CSS file includes -- -->
+<link rel="stylesheet" href="core/css/geof_icons.css" />
+<link rel="stylesheet" href="core/css/geof_common.css" />
+<link rel="stylesheet" href="core/css/geofui.css" />
+<link rel="stylesheet" href="core/css/viewfile.css" />
+<link rel="stylesheet" href="core/css/geof_jquery_custom.css" />
+<link rel="stylesheet" href="css/dopple.css" />
+
+<!-- third japi party javascript files -->
+<script src="core/js/tp/jquery/jquery-2.1.0.min.js"></script>
+<script src="core/js/tp/jquery/jquery-ui-1.10.3.min.js"></script>
+<script src="core/js/tp/jquery/jquery-ui-timepicker-addon.js"></script>
+<script src="core/js/tp/jquery/jquery-ui-sliderAccess.js"></script>
+<script src="core/js/tp/jquery/jquery.mousewheel.js"></script>
+<script src="core/js/tp/json.js"></script>
+<script src="core/js/tp/xml2json.min.js"></script>
+<script src="core/js/tp/stanford/jsbn.js"></script>
+<script src="core/js/tp/stanford/jsbn2.js"></script>
+<script src="core/js/tp/stanford/prng4.js"></script>
+<script src="core/js/tp/stanford/rng.js"></script>
+<script src="core/js/tp/stanford/rsa.js"></script>
+<script src="core/js/tp/stanford/rsa2.js"></script>
+<script src="core/js/tp/stanford/sjcl.js"></script>
+<script src="core/js/tp/kinetic-v4.7.4.min.js"></script>
+<script src="core/js/tp/base64.js"></script>
+<script src="core/js/tp/nl_exif.js"></script>
+<script src="core/js/tp/zip/zip.js"></script>
+<script src="core/js/tp/zip/inflate.js"></script>
+<script src="core/js/tp/commons-validator-1.4.0-compress.js"></script>
+
+<!-- core japi javascript files -->
+<script src="core/js/comm/grequest.js"></script>
+<script src="core/js/comm/gsession.js"></script>
+<script src="core/js/comm/login.js"></script>
+<script src="core/js/comm/notification.js"></script>
+<script src="core/js/comm/recorder.js"></script>
+<script src="core/js/comm/requery.js"></script>
+<script src="core/js/comm/retrieve.js"></script>
+<script src="core/js/comm/sjclaes.js"></script>
+<script src="core/js/comm/transaction.js"></script>
+<script src="core/js/comm/uploadfile.js"></script>
+<script src="core/js/comm/uploadHandler.js"></script>
+
+<script src="core/js/ext/kinetic_extensions.js"></script>
+<script src="core/js/ext/timecontrol.js"></script>
+
+<script src="core/js/util/formfiller.js"></script>
+<script src="core/js/util/gicon.js"></script>
+<script src="core/js/util/japi_utils.js"></script>
+
+<script src="core/js/file/filetypes.js"></script>
+
+<script src="core/js/mvc/gmenu.js"></script>
+<script src="core/js/mvc/panel_mgr.js"></script>
+<script src="core/js/mvc/geof_cntrl.js"></script>
+<script src="core/js/mvc/japi_cntrl.js"></script>
+<script src="core/js/mvc/gmodel.js"></script>
+
+<!-- dopple javascript files -->
+<script src="js/util/geof_data.js"></script>
+<script src="js/event/gevent.js"></script>
+
+<script src="js/mvc/full_view.js"></script>
+<script src="js/mvc/dpl_cntrl.js"></script>
+<script src="js/mvc/dopple_menu.js"></script>
+
+
+<!-- ------------------------------------- -->
+<!-- Start index file javascript code here -->
+
+<script type="text/javascript">
+
+var Geof = Geof || {};
+Geof.webservice='dpl';
+
+Geof.initialized = false;
+Geof.isFirstShow = true;
+
+Geof.stats = {};
+Geof.dash = {};
+
+$(function() {
+
+    // Disable caching of AJAX responses
+    $.ajaxSetup ({cache:false});
+
+    GLocal.load();
+
+    var pOpts = {view:'#leftViewSlideout'};
+    PanelMgr.initialize(pOpts);
+
+    zip.workerScriptsPath = "tp/zip/";
+
+    Geof.menuctrl.setControl("spanMenu","divGeofContent");
+    Geof.cntrl.profile.setControl("spanProfile");
+    Geof.recorder.setControl("spanRecorder");
+    Geof.notifier.setControl('spanNotifier');
+
+    TransMgr.setControl("spanTransmit");
+
+    var loginButtonCallback = function() {
+        if (Geof.session.sessionId || false) {
+//            Geof.cntrl.search.clearSearch();
+            Geof.menuctrl.setMenu('main');
+            $("#btnLoginIcon").title = "Login";
+            Geof.session.logout();
+        } else {
+            loginCallback(false);
+        }
+    };
+
+    Geof.login.setControl({
+        container:'spanLogin',
+        login_click: loginButtonCallback,
+        login_callback:loginCallback,
+        must_use_rsa:true
+    });
+
+
+    $( '#mainBody' ).tooltip();
+    //remove the authcode from Geof.cntrl.usr
+    JsUtil.spliceByField(Geof.cntrl.usr.link,'name','authcode');
+
+    Gicon.click('btnGoCalendar', function() {
+        window.location = 'index.html';
+    })
+});
+
+function loginCallback(isLoggedIn, err_msg) {
+    Gicon.toggleActive('btnLoginIcon', isLoggedIn);
+    Geof.logged_in = isLoggedIn;
+    var $usr_name = $("#usr_name");
+    if ( isLoggedIn ) {
+
+        Geof.login.hide();
+
+        $usr_name.text(Geof.session.usrName);
+        Geof.recorder.populateList();
+
+        $("#btnLoginIcon").title = "Log Out";
+        if (Geof.isFirstShow ) {
+            Geof.menuctrl.setStage("divMenu");
+        } else {
+            Geof.menuctrl.change(Geof.menuctrl.cur_menu)
+        }
+        Geof.isFirstShow = false;
+        Geof.notifier.start(true);
+
+        Transaction.post( GRequest.build("configuration","read",null,{}) , function(req){
+            var jobj = JsUtil.filter(req.data, {name:'show_test'});
+            Geof.recorder.show_test = (jobj.length == 1 && jobj[0].value == 'true');
+        });
+
+    } else {
+        $usr_name.text("----- -----");
+        Geof.menuctrl.setCurrentMenu({type:'menu',name:'main'});
+        Geof.menuctrl.hideAll();
+        Geof.login.show(err_msg);
+        Geof.notifier.stop();
+    }
+
+    Geof.menuctrl.enableButtons(isLoggedIn);
+}
+
+</script>
+
+</head>
+<body id="mainBody" class="margin_zero" >
+<div id="divHeaderBar" class="headerbar margin_zero">
+    <span class="iconLeft margin_zero" id="spanMenu"></span>
+    <span class="ui-icon icon_geof_calendar_enable iconLeft" id="btnGoCalendar" title="Go to Calendar"></span>
+
+    <span class="iconRight margin_zero" id="spanLogin"></span>
+    <span class="iconRight margin_zero" id="spanTransmit"></span>
+    <span class="iconRight margin_zero" id="spanNotifier"></span>
+    <span class="iconRight margin_zero" id="spanRecorder"></span>
+    <span class="iconRight margin_zero" id="spanProfile"></span>
+</div>
+<div id="divGeofContent" class="geofcontent"></div>
+</body>
+</html>

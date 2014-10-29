@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="dopple" basedir="."> 
+	
+    <property name="user" value="${arg0}"/>
+	<property name="pwd" value="${arg1}"/>
+    <property name="dserver" value="${arg2}"/>
+    
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="debug" value="on"/>
+
+	<path id="svnant.class.path">
+  		<pathelement location="${ant.home}/svnant.jar" />
+  		<pathelement location="${ant.home}/svnClientAdapter.jar" />
+  		<pathelement location="${ant.home}/svnjavahl.jar" />
+  		<pathelement location="${ant.home}/svnkit.jar" />
+ 	</path>
+	
+	<typedef resource="org/tigris/subversion/svnant/svnantlib.xml" classpathref="svnant.class.path" /> 
+
+	<svnSetting svnkit="false" javahl="false" id="svn.settings" username="${user}" password="${pwd}" />
+
+	<property name="svn_google" value="http://geofixated.googlecode.com/svn/trunk"/>
+
+	<property name="dpl_dev" value="/home/${arg0}/dev/google_dev/geofixated"/>
+	<property name="web_core" value="${dpl_dev}/core_web"/>
+	<property name="dpl_web" value="${dpl_dev}/dpl_svr/web"/>
+	
+	<property name="svn_core_svr" value="${svn_google}/core_svr"/>
+	<property name="svn_core_web" value="${svn_google}/core_web"/>
+
+	<property name="svn_dpl_svr" value="${svn_google}/dpl_svr/svr"/>
+	<property name="svn_dpl_web" value="${svn_google}/dpl_svr/web"/>
+	<property name="svn_dpl_install" value="${svn_google}/dpl_svr/install/scripts"/>
+	
+	<property name="svn_admin" value="${svn_google}/geof_admin"/>
+    
+	<property name="build.dir" value="./build"/>
+	<property name="web_upl" value="${build.dir}/webupl"/>
+	<property name="tomcat.dir" value="."/>
+	<property name="install.dest" value="."/> 
+		
+	<property name="core.dir" value="${build.dir}/core"/>
+	<property name="core.src" value="${core.dir}/src"/>
+	<property name="core.lib" value="${core.dir}/lib"/>
+	
+	<property name="svr.dir" value="${build.dir}/svr"/>
+	<property name="svr.src" value="${svr.dir}/src"/>
+	<property name="svr.lib" value="${svr.dir}/lib"/>
+	
+	<property name="dpl.dir" value="${tomcat.dir}/dpl"/>
+	<property name="webinf.dir" value="${dpl.dir}/WEB-INF"/>
+
+	<property name="admin.dir" value="${build.dir}/admin"/>
+	<property name="admin.src" value="${admin.dir}/src"/>
+
+	<property name="jar.dir" value="${build.dir}/classes"/>
+	<property name="admin.jar.dir" value="${admin.src}/classes"/>		
+
+	<property name="dpl.install" value="${build.dir}/dpl_ws_install.tar.gz"/>
+	<property name="zip.dpl.web" value="${build.dir}/dpl_web.tar.gz"/>
+			
+	<property name="jar.file" value="dopple.jar"/>
+	<property name="web.dir" value="webapp"/>
+	<property name="admin.jar" value="geof_admin.jar"/>
+
+	<path id="classpath">
+        <fileset dir="${svr.lib}" includes="**/*.jar"/>
+        <fileset dir="${core.lib}" includes="**/*.jar"/>
+    </path>
+    
+	<target name="clean_dpl_jar">
+        <delete dir="${build.dir}" />
+    </target>
+
+	<target name="clean_web_upl">
+        <delete dir="${web_upl}" />
+    </target>
+
+	<target name="clean_dpl_web">
+        <delete dir="${dpl.dir}" />
+    </target>
+
+	<target name="clean_dpltui_web">
+        <delete dir="${dpltui.dir}" />
+    </target>
+
+	<target name="export_dpl_svr" depends="clean_dpl_jar">
+		<svn refid="svn.settings" >
+   			<export srcUrl="${svn_core_svr}/src" destPath="${core.src}"/>
+ 			<export srcUrl="${svn_core_svr}/lib" destPath="${core.lib}"/>
+   			<export srcUrl="${svn_dpl_svr}/src" destPath="${svr.src}"/>
+   			<export srcUrl="${svn_dpl_svr}/lib" destPath="${svr.lib}"/>
+   			<export srcUrl="${svn_admin}/src" destPath="${admin.src}"/>
+ 		</svn>
+	    <exec executable="svnversion" outputproperty="svnversion"/>
+	    <replaceregexp file="${core.src}/org/geof/request/VersionRequest.java"
+               match="svn_version"
+               replace="${svnversion}"
+               byline="true"
+		/>
+ 	</target>
+ 	
+	<target name="compile_dpl" depends="export_dpl_svr">
+        <mkdir dir="${build.dir}" />
+        <mkdir dir="${jar.dir}" />
+        <mkdir dir="${admin.jar.dir}" />
+        <javac srcdir="${svr.src}:${core.src}" destdir="${jar.dir}" classpathref="classpath" includeantruntime="false" debug="${debug}"/>
+	</target>
+	
+    <target name="upl_dpl_jar" depends="compile_dpl">
+    	<jar destfile="${build.dir}/${jar.file}" basedir="${jar.dir}" />
+		<scp file="${build.dir}/${jar.file}" todir="${user}@${dserver}:/home/${user}/${jar.file}" password="${pwd}" trust="true" />
+    	<sshexec host="${dserver}"
+    		username="${user}"
+    		password="${pwd}"
+    		trust="true"
+    		command="sudo cp -f /home/${arg0}/${jar.file} /var/lib/tomcat7/webapps/dpl/WEB-INF/lib/${jar.file}"/>
+    	<antcall target="restart_tomcat"/>
+    </target>
+	
+	<property name="local_dir" value="/home/${arg0}/dev/google_dev/geofixated"/>
+	<path id="classpath_local">
+        <fileset dir="${local_dir}/dpl_svr/svr/lib" includes="**/*.jar"/>
+        <fileset dir="${local_dir}/core_svr/lib" includes="**/*.jar"/>
+    </path>
+    
+    <target name="upl_dpl_jar_local" depends="clean_dpl_jar">
+        <mkdir dir="${build.dir}" />
+        <mkdir dir="${jar.dir}" />
+        <javac srcdir="${local_dir}/core_svr/src:${local_dir}/dpl_svr/svr/src" destdir="${jar.dir}" classpathref="classpath_local" includeantruntime="false" debug="${debug}"/>
+    	<jar destfile="${build.dir}/${jar.file}" basedir="${jar.dir}" />
+		<scp file="${build.dir}/${jar.file}" todir="${user}@${dserver}:/home/${user}/${jar.file}" password="${pwd}" trust="true" />
+    	<sshexec host="${dserver}"
+    		username="${user}"
+    		password="${pwd}"
+    		trust="true"
+    		command="sudo cp -f /home/${arg0}/${jar.file} /var/lib/tomcat7/webapps/dpl/WEB-INF/lib/${jar.file}"/>
+    	<antcall target="restart_tomcat"></antcall>
+    </target>	
+	
+	<target name="compile_admin" depends="export_dpl_svr">
+        <mkdir dir="${build.dir}" />
+        <mkdir dir="${jar.dir}" />
+        <mkdir dir="${admin.jar.dir}" />
+        <javac srcdir="${admin.src}:${core.src}" destdir="${admin.jar.dir}" 
+        	classpathref="classpath" includeantruntime="false" debug="on"/>
+	</target>
+
+    <target name="jar_dpl" depends="compile_dpl">
+        <jar destfile="${build.dir}/${jar.file}" basedir="${jar.dir}"></jar>
+    	<!--
+        <jar destfile="${build.dir}/${admin.jar}" basedir="${admin.jar.dir}"></jar>
+        -->
+    </target>
+	
+    <target name="jar_admin" depends="compile_admin">
+        <jar destfile="${build.dir}/${admin.jar}" basedir="${admin.jar.dir}"></jar>
+    </target>
+	
+    <target name="scp_admin" depends="jar_admin">
+		<scp file="${build.dir}/${admin.jar}" todir="${user}@dev205:/home/${user}/." password="${pwd}" trust="true" />
+    </target>
+	
+    <target name="dpl_web" depends="clean_dpl_web,compile_dpl">
+		<svn refid="svn.settings" >
+   			<export srcUrl="${svn_dpl_web}" destPath="${dpl.dir}/."/>
+ 			<export srcUrl="${svn_core_web}" destPath="${dpl.dir}/core"/>
+ 		</svn>
+		<copy todir="${webinf.dir}/lib">
+			<fileset dir="${core.lib}"/>
+			<fileset dir="${svr.lib}"/>
+		</copy>
+		<svn refid="svn.settings" >
+   			<export srcUrl="${svn_dpl_install}/dpl_admin.sh" destPath="${webinf.dir}/lib"/>
+ 		</svn>
+		<delete file="${webinf.dir}/lib/servlet-api.jar" />
+        <jar destfile="${webinf.dir}/lib/${jar.file}" basedir="${jar.dir}"></jar>
+        <jar destfile="${webinf.dir}/lib/${admin.jar}" basedir="${admin.jar.dir}"></jar>
+    </target>
+	
+	<target name="tar_dpl_web" depends="dpl_web" >
+   		<tar destfile="${dpl.install}" basedir="${dpl.dir}" compression="gzip"/>
+ 	</target>
+
+	<target name="upload_install_dpl" depends="tar_dpl_web" >
+		<scp file="${dpl.install}" todir="${user}@pi:/var/www/dpl/install/." password="${pwd}" trust="true"/>
+ 	</target>
+
+	<target name="upload_install_files"  depends="clean_web_upl, upload_install_dpl">
+		<svn refid="svn.settings" >
+   			<export srcUrl="${svn_dpl_install}" destPath="${web_upl}"/>
+ 		</svn>
+		<scp todir="${user}@pi:/var/www/dpl/install/." password="${pwd}" trust="true">
+			<fileset dir="${web_upl}"/>
+		</scp>
+ 	</target>
+
+    <target name="zip_dpl_web" depends="clean_dpl_web">
+		<svn refid="svn.settings" >
+   			<export srcUrl="${svn_dpl_web}" destPath="${dpl.dir}/."/>
+ 			<export srcUrl="${svn_core_web}" destPath="${dpl.dir}/core"/>
+ 		</svn>
+		<tar destfile="${zip.web}" basedir="${geof.dir}" compression="gzip"/>
+<!--  Don't need this yet since the laptop will be destination - Use copy instead
+   		<scp file="${zip.web}" todir="${user}@dev205:/home/${user}/." password="${pwd}" trust="true"/>
+-->
+    </target>
+
+    <target name="upd_dpl_web" depends="clean_dpl_web">
+		<svn refid="svn.settings" >
+   			<export srcUrl="${svn_dpl_web}" destPath="${dpl.dir}/."/>
+ 			<export srcUrl="${svn_core_web}" destPath="${dpl.dir}/core"/>
+ 		</svn>
+		<delete dir="${dpl.dir}/WEB-INF" />
+    	<!--
+    	<echo message="user: ${user}, pwd: ${pwd}"/>
+    	-->
+		<scp todir="${user}@${dserver}:/home/${arg0}/stage/dpl/." password="${pwd}" trust="true">
+			<fileset dir="${dpl.dir}"/>
+		</scp>
+    	<sshexec host="${dserver}"
+    		username="${user}"
+    		password="${pwd}"
+    		trust="true"
+    		command="sudo cp -rf /home/${arg0}/stage/dpl/* /var/lib/tomcat7/webapps/dpl/."/>
+    	<sshexec host="${dserver}"
+    		username="${user}"
+    		password="${pwd}"
+    		trust="true"
+    		command="sudo chown -R tomcat7:tomcat7 /var/lib/tomcat7/webapps/dpl"/>
+    </target>
+	
+    <target name="restart_tomcat" >
+    	<sshexec host="${dserver}"
+    		username="${user}"
+    		password="${pwd}"
+    		trust="true"
+    		command="sudo service tomcat7 restart"/>
+    	<antcall target="print_time"/>
+    </target>
+	
+	<target name="print_time">
+	  <tstamp>
+	    <format property="current.time" pattern="MM/dd/yyyy hh:mm:ss aa" />
+	  </tstamp>
+	  <echo message="${current.time}" />
+	</target>    
+	
+	<target name="promote_dpl" depends="clean_dpl_web">
+        <mkdir dir="${dpl.dir}/core" />
+
+		<copy todir="${dpl.dir}/core">
+			<fileset dir="${web_core}"/>
+		</copy>
+
+		<copy todir="${dpl.dir}">
+			<fileset dir="${dpl_web}"/>
+		</copy>
+
+		<delete dir="${dpl.dir}/WEB-INF" />
+		<scp todir="${user}@${dserver}:/home/${arg0}/stage/dpl/." password="${pwd}" trust="true">
+			<fileset dir="${dpl.dir}"/>
+		</scp>
+    	<sshexec host="${dserver}"
+    		username="${user}"
+    		password="${pwd}"
+    		trust="true"
+    		command="sudo cp -rf /home/${arg0}/stage/dpl/* /var/lib/tomcat7/webapps/dpl/."/>
+    	<sshexec host="${dserver}"
+    		username="${user}"
+    		password="${pwd}"
+    		trust="true"
+    		command="sudo chown -R tomcat7:tomcat7 /var/lib/tomcat7/webapps/dpl"/>
+    </target>
+
+</project>
+

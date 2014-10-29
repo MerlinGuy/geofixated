@@ -1,0 +1,87 @@
+<div class="listDetail" id="Dom_list">
+    <table><tr>
+        <td class="content_panelB">
+            <div class="buttonBar" >
+                <span class="ui-icon icon_geof_discard iconLeft" id="btnDiscardDomain" title="Delete Domain"></span>
+                <span class="ui-icon icon_geof_build iconLeft" id="btnShowCloneDialog"  title="Clone Domain"></span>
+                <span class="ui-icon icon_geof_import iconLeft" id="btnImportGuest"  title="Import Domain"></span>
+                <span class="ui-icon icon_geof_cut iconLeft" id="btnSeverGuest"  title="Sever Domain from Database"></span>
+                <span class="ui-icon icon_geof_refresh_enable iconRight" id="btnRefreshDomain" title="Refresh Domain"></span>
+            </div>
+            <div class="pnlListItems">
+                <div class="list_header">
+                    <label class="hdrLabelLeft flw175">Name</label>
+                    <label class="hdrLabelLeft flw60">Owner</label>
+                    <label class="hdrLabelLeft flw70">Status</label>
+                    <label class="hdrLabelLeft flw50">Type</label>
+                </div>
+                <div class="pnl_listBlockNoWidth w440" >
+                    <ol id="olDomains" class="OlStdSelect2"></ol>
+                </div>
+            </div>
+        </td>
+        <td class="content_panelB">
+            <div class="dialogHeader">
+                <span class="ui-icon icon_geof_save iconRight" id="btnDomainSave" title="Save Domain Changes"></span>
+                <label class="stdlabel" >ID:<label id="domain_id"></label></label>
+            </div>
+            <div class="inline3">
+                <label class="stdlabel floatLeft mt8">Name:</label>
+                <label class="dataDisplay flw180 mt8" id="domain_name"></label>
+                <span class="ui-icon icon_geof_play iconLeft" id="btnDomainStatus" title="Start Domain"></span>
+                <div class="floatRight border w120">
+                    <input type="checkbox" class="floatLeft mt8" id="domain_runnable"/>
+                    <label class="stdlabel floatLeft mt8" for="domain_runnable">Runnable</label>
+                </div>
+            </div>
+
+            <div class="inline3">
+                <label class="stdlabel floatLeft">Status:</label>
+                <label class="dataDisplay flw90" id="domain_status"></label>
+                <label class="stdlabel flw40">Type:</label>
+                <label class="dataDisplay flw80" id="domain_type"></label>
+            </div>
+
+            <div class="inline3">
+                <label class="stdlabel">Build Plan:</label>
+                <select id="domain_buildplanid" class="buildplan" size="1"></select>
+            </div>
+
+            <div class="inline3">
+                <label class="stdlabel">Start Date:</label>
+                <input type="text" id="domain_startdate" size="16" >
+                <label class="stdlabel">End Date:</label>
+                <input type="text" id="domain_enddate" size="16" >
+            </div>
+
+            <div class="inline3">
+                <label class="stdlabel">XML Path</label>
+                <input type="text" spellcheck="false" id="domain_xmlpath" size="36" readonly>
+            </div>
+
+            <div class="inline3">
+                <label class="stdlabel floatLeft mt8">Owner: </label>
+                <label class="dataDisplay flw290" id="domain_owner"></label>
+            </div>
+
+            <div class="inline3">
+                <label class="stdlabel floatLeft mt8">Mac Ip: </label>
+                <label class="dataDisplay flw290 mt8" id="domain_ipmac"></label>
+                <span class="ui-icon icon_geof_transmit iconLeft" id="macipReachable" title="Domain Reachable"></span>
+            </div>
+
+            <div class="inline4">
+                <label class="stdlabel">Description:</label><br>
+                <textarea maxlength="512" spellcheck="false" id="domain_description" cols="50" rows="3"></textarea><br>
+            </div>
+
+            <label class="imglabel floatLeft">Domain Image Files:</label>
+            <div class="dplInstallItems">
+                <div class="list_header">
+                    <label class="hdrLabelLeft flw180">Path</label>
+                </div>
+                <ol id="olDomImageFiles" class="OlInstallList"></ol>
+            </div>
+        </td>
+    </tr></table>
+</div>

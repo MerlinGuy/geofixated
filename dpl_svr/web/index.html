@@ -1,0 +1,266 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Dopple - Virtual Demo Management</title>
+
+<!-- Third Party CSS file includes -- -->
+<link rel="stylesheet" href="core/js/tp/css/jquery-ui-1.10.3.custom.min.css" />
+<link rel="stylesheet" href="core/js/tp/css/jquery-ui-timepicker-addon.min.css" />
+<link rel="stylesheet" href="core/js/tp/fullcalendar/fullcalendar.css" />
+
+<!-- -- CSS file includes -- -->
+<link rel="stylesheet" href="core/css/geof_icons.css" />
+<link rel="stylesheet" href="core/css/geof_common.css" />
+<link rel="stylesheet" href="core/css/geofui.css" />
+<link rel="stylesheet" href="core/css/viewfile.css" />
+<link rel="stylesheet" href="core/css/geof_jquery_custom.css" />
+<link rel="stylesheet" href="css/dopple.css" />
+
+<!-- third japi party javascript files -->
+<script src="core/js/tp/jquery/jquery-2.1.0.min.js"></script>
+<script src="core/js/tp/jquery/jquery-ui-1.10.3.min.js"></script>
+<script src="core/js/tp/json.js"></script>
+<script src="core/js/tp/stanford/jsbn.js"></script>
+<script src="core/js/tp/stanford/jsbn2.js"></script>
+<script src="core/js/tp/stanford/prng4.js"></script>
+<script src="core/js/tp/stanford/rng.js"></script>
+<script src="core/js/tp/stanford/rsa.js"></script>
+<script src="core/js/tp/stanford/rsa2.js"></script>
+<script src="core/js/tp/stanford/sjcl.js"></script>
+<script src="core/js/tp/base64.js"></script>
+<script src="core/js/tp/fullcalendar/fullcalendar.min.js"></script>
+
+<!-- core japi javascript files -->
+<script src="core/js/comm/grequest.js"></script>
+<script src="core/js/comm/gsession.js"></script>
+<script src="core/js/comm/login.js"></script>
+<script src="core/js/comm/notification.js"></script>
+<script src="core/js/comm/recorder.js"></script>
+<script src="core/js/comm/requery.js"></script>
+<script src="core/js/comm/retrieve.js"></script>
+<script src="core/js/comm/sjclaes.js"></script>
+<script src="core/js/comm/transaction.js"></script>
+
+<script src="core/js/util/gicon.js"></script>
+<script src="core/js/util/japi_utils.js"></script>
+<script src="core/js/mvc/panel_mgr.js"></script>
+<script src="core/js/mvc/japi_cntrl.js"></script>
+<script src="core/js/mvc/gmodel.js"></script>
+
+<!-- dopple javascript files -->
+<script src="js/util/geof_data.js"></script>
+<script src="js/event/gevent.js"></script>
+<script src="js/mvc/dpl_cntrl.js"></script>
+
+<!-- ------------------------------------- -->
+<!-- Start index file javascript code here -->
+
+<script type="text/javascript">
+
+var Geof = Geof || {};
+Geof.webservice='dpl';
+Geof.initialized = false;
+
+Geof.stats = {};
+
+Geof.max_guests = 2;
+Geof.cur_guests = 0;
+Geof.max_usr_guests = 1;
+
+Geof.cal = null;
+Geof.domain = {};
+Geof.oneDay = 24*60*60*1000;
+Geof.reloadingGuests = false;
+
+$(function() {
+
+    // Disable caching of AJAX responses
+    $.ajaxSetup ({cache:false});
+    $( '#mainBody' ).tooltip({show:{delay:500}});
+
+    GLocal.load();
+
+    var pOpts = {view:'#leftViewSlideout'};
+    PanelMgr.initialize(pOpts);
+
+//    Geof.menuctrl.setControl("spanMenu","divGeofContent");
+    Geof.cntrl.profile.setControl("spanProfile");
+    Geof.recorder.setControl("spanRecorder");
+    Geof.notifier.setControl('spanNotifier');
+
+    TransMgr.setControl("spanTransmit");
+
+    var loginButtonCallback = function() {
+        if (Geof.session.sessionId || false) {
+            Geof.cntrl.search.clearSearch();
+            Geof.menuctrl.setMenu('main');
+            $("#btnLoginIcon").title = "Login";
+            Geof.session.logout();
+        } else {
+            loginCallback(false);
+        }
+    };
+
+    Geof.login.setControl({
+        container:'spanLogin',
+        login_click: loginButtonCallback,
+        login_callback:loginCallback,
+        must_use_rsa:true
+    });
+
+    Gicon.click('btnUrlDopple', function() {
+        window.location = 'dpladmin.html';
+    });
+
+    Gicon.click('btnCreateDemo', function() {
+        var startDate = Geof.cntrl.calendar.startDay;
+        Geof.cntrl.guest.showCreateDemo(startDate, reloadGuests);
+    });
+
+    Gicon.click('btnRefreshCalendar',reloadGuests);
+    Gicon.click('btnDiscardDemo', discardGuest);
+    Gicon.click('btnRegister', Geof.cntrl.tenant.addNew);
+
+    Geof.cntrl.calendar.initialize('calendar', calDaySelected, guestSelect, setGuestDiscard );
+    Geof.showUI('btnUrlDopple','configuration', 'read', false);
+});
+
+function initialize() {
+
+    Geof.initialized = true;
+    var cb = function(req){
+        JsUtil.iterate( req.data[0], function(value,key) {
+            Geof[key] = parseInt(value);
+        });
+        reloadGuests();
+    };
+    Geof.cntrl.guest.getGuestInfo(cb);
+}
+
+function loginCallback(isLoggedIn, err_msg) {
+    Geof.logged_in = isLoggedIn;
+    var $usr_name = $("#usr_name");
+
+    if ( isLoggedIn ) {
+        $usr_name.text(Geof.session.usrName);
+        Geof.recorder.populateList();
+        Geof.notifier.start();
+        initialize();
+        resetDemoCreate();
+    } else {
+        $usr_name.text("logged out");
+        Geof.login.show(err_msg);
+        Geof.notifier.stop();
+    }
+    Geof.showUI('btnUrlDopple','configuration', 'read', isLoggedIn);
+}
+
+function guestSelect (calEvent) {
+    if (Geof.session || false ) {
+        if (Geof.session.can("domain","delete") ){
+            return true;
+        } else {
+            return calEvent.usrid == Geof.session.usr.usrid;
+        }
+    }
+    return false;
+}
+
+function setGuestDiscard(canDiscard) {
+    Gicon.setEnabled('btnDiscardDemo', canDiscard);
+}
+
+function reloadGuests() {
+    Geof.cur_guests = 0;
+    if (! Geof.reloadingGuests) {
+        Geof.reloadingGuests = true;
+        Gicon.setEnabled('btnDiscardDemo', false);
+        Gicon.setActive('btnRefreshCalendar', true);
+        var cal = Geof.cntrl.calendar;
+        cal.clear();
+
+        var loadGuestsCB = function(row) {
+            var sdate = DateUtil.parseDate(row.startdate);
+            var edate = DateUtil.parseDate(row.enddate);
+            Gicon.setEnabled('btnRefreshCalendar', true);
+            cal.addDomainDates({
+                startdate:sdate,
+                enddate:edate,
+                name:row.name,
+                status:row.status,
+                usrid:row.usrid,
+                domainid:row.id
+            });
+            if (row.usrid == Geof.session.id()) {
+                Geof.cur_guests += 1;
+            }
+        };
+
+        var transCB = function(req) {
+            JsUtil.iterate(req.data, loadGuestsCB);
+            cal.render();
+            Gicon.setEnabled('btnRefreshCalendar', true);
+            resetDemoCreate();
+            Geof.reloadingGuests = false;
+        };
+        var rRead = GRequest.build('guest','read',null,{});
+
+        Transaction.post(rRead, transCB);
+    }
+}
+
+function discardGuest() {
+    var domainid = Geof.cntrl.calendar.selectedEvent.domainid;
+    if (domainid || false) {
+        Geof.cntrl.guest.discardGuest(domainid, reloadGuests);
+    }
+}
+
+function calDaySelected() { //date) {
+//    var enabled = Geof.cntrl.calendar.getDayEventCount(date) >= Geof.max_guests;
+//    Gicon.setEnabled('btnCreateDemo',enabled);
+    resetDemoCreate();
+}
+
+function resetDemoCreate() {
+    var canCreate = (
+        (Geof.session || false)
+        && Geof.session.can('guest','create')
+        && (Geof.cntrl.calendar.selectedDay || false)
+        && (Geof.cntrl.calendar.getSelectedDayCount() <= Geof.max_guests)
+        && (Geof.cur_guests < Geof.max_usr_guests)
+    );
+    Gicon.setEnabled('btnCreateDemo', canCreate);
+}
+
+
+</script>
+
+</head>
+<body id="mainBody" class="margin_zero" >
+<div class="headerbar margin_zero">
+    <span class="iconLeft margin_zero" id="spanMenu"></span>
+    <span class="iconRight margin_zero" id="spanLogin"></span>
+    <span class="iconRight margin_zero" id="spanTransmit"></span>
+    <span class="iconRight margin_zero" id="spanNotifier"></span>
+    <span class="iconRight margin_zero" id="spanRecorder"></span>
+    <span class="iconRight margin_zero" id="spanProfile"></span>
+    <hr class="vertical_bar floatRight mr12">
+    <span class="ui-icon icon_geof_system_enable iconRight hidden" id="btnUrlDopple" title="Go to Dopple Admin"></span>
+</div>
+<div id="divContent" >
+    <div id="calander_section" class="cal_section">
+        <div class="inputbar margin_zero">
+            <label class="stdlabel floatLeft mt8">Register New User</label>
+            <span class="ui-icon icon_geof_edit_enable iconLeft mr12" id="btnRegister"  title="Register with Dopple"></span>
+            <span class="ui-icon icon_geof_discard iconLeft" id="btnDiscardDemo" title="Discard Domain"></span>
+
+            <span class="ui-icon iconRight icon_geof_refresh_enable ml14" id="btnRefreshCalendar" title="Refresh Calendar"></span>
+            <span class="ui-icon icon_geof_new iconRight mr30 ml8" id="btnCreateDemo"  title="Create a new Demo"></span>
+            <label class="stdlabel floatRight mt8">Create Your New Demo</label>
+        </div>
+        <div id='calendar' class="calendar"></div>
+    </div>
+</div>
+</body>
+</html>

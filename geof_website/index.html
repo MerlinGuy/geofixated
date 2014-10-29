@@ -1,0 +1,216 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Geofixated</title>
+
+<!-- Third Party CSS file includes -- -->
+<link rel="stylesheet" href="core/js/tp/css/jquery-ui-1.10.3.custom.min.css" />
+<link rel="stylesheet" href="core/js/tp/css/jquery-ui-timepicker-addon.min.css" />
+<link rel="stylesheet" type="text/css" href="tp/jqGrid/css/ui.jqgrid.css" />
+
+<!-- -- CSS file includes -- -->
+<link rel="stylesheet" href="core/css/geof_icons.css" />
+<link rel="stylesheet" href="core/css/geof_common.css" />
+<link rel="stylesheet" href="core/css/geofui.css" />
+<link rel="stylesheet" href="core/css/viewfile.css" />
+<link rel="stylesheet" href="core/css/geof_jquery_custom.css" />
+
+<!-- third japi party javascript files -->
+<script src="core/js/tp/jquery/jquery-2.1.0.min.js"></script>
+<script src="core/js/tp/jquery/jquery-ui-1.10.3.min.js"></script>
+<script src="core/js/tp/jquery/jquery-ui-timepicker-addon.min.js"></script>
+<script src="core/js/tp/jquery/jquery-ui-sliderAccess.js"></script>
+<script src="core/js/tp/jquery/jquery.mousewheel.js"></script>
+<script src="core/js/tp/json.js"></script>
+<script src="core/js/tp/stanford/jsbn.js"></script>
+<script src="core/js/tp/stanford/jsbn2.js"></script>
+<script src="core/js/tp/stanford/prng4.js"></script>
+<script src="core/js/tp/stanford/rng.js"></script>
+<script src="core/js/tp/stanford/rsa.js"></script>
+<script src="core/js/tp/stanford/rsa2.js"></script>
+<script src="core/js/tp/stanford/sjcl.js"></script>
+<script src="core/js/tp/base64.js"></script>
+<script src="core/js/tp/commons-validator-1.4.0-compress.js"></script>
+
+<!-- third geofixated party javascript files -->
+<script src="tp/jqGrid/js/i18n/grid.locale-en.js"></script>
+<script src="tp/jqGrid/js/jquery.jqGrid.min.js"></script>
+
+<script src="core/js/tp/kinetic-v4.7.4.min.js"></script>
+<script src="core/js/tp/nl_exif.js"></script>
+<script src="core/js/tp/zip/zip.js"></script>
+<script src="core/js/tp/zip/inflate.js"></script>
+
+<script src="tp/timeline/src/ajax/api/simile-ajax-api.js?bundle=false"></script>
+<script src="tp/timeline/src/webapp/api/timeline-api.js?bundle=false"></script>
+
+<script type="text/javascript"
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAebzlNTIv_Dxmo3wbhWm8kVa6-9X71dPA&sensor=false&libraries=geometry">
+</script>
+
+<!-- core japi javascript files -->
+<script src="core/js/comm/grequest.js"></script>
+<script src="core/js/comm/gsession.js"></script>
+<script src="core/js/comm/login.js"></script>
+<script src="core/js/comm/notification.js"></script>
+<script src="core/js/comm/recorder.js"></script>
+<script src="core/js/comm/requery.js"></script>
+<script src="core/js/comm/retrieve.js"></script>
+<script src="core/js/comm/sjclaes.js"></script>
+<script src="core/js/comm/transaction.js"></script>
+<script src="core/js/comm/uploadfile.js"></script>
+
+<script src="core/js/util/formfiller.js"></script>
+<script src="core/js/util/gicon.js"></script>
+<script src="core/js/util/japi_utils.js"></script>
+
+<script src="core/js/mvc/panel_mgr.js"></script>
+<script src="core/js/mvc/japi_cntrl.js"></script>
+<script src="core/js/mvc/gmodel.js"></script>
+
+<script src="core/js/file/filetypes.js"></script>
+
+<script src="core/js/mvc/gmenu.js"></script>
+<script src="core/js/event/gevent.js"></script>
+
+<script src="core/js/ext/kinetic_extensions.js"></script>
+<script src="core/js/ext/timecontrol.js"></script>
+
+
+<!-- geofixated javascript files -->
+<script src="js/util/geof_data.js"></script>
+<script src="js/util/gpsutil.js"></script>
+
+<script src="js/file/gps/readers.js"></script>
+
+<script src="js/mvc/geofixated_menu.js"></script>
+<script src="js/mvc/adjusttime.js"></script>
+<script src="js/mvc/datagrid_view.js"></script>
+<script src="js/mvc/full_view.js"></script>
+<script src="js/mvc/gmap_popup.js"></script>
+<script src="js/mvc/map.js"></script>
+<script src="js/mvc/map_view.js"></script>
+<script src="js/mvc/photo_popup.js"></script>
+<script src="js/mvc/search.js"></script>
+<script src="js/mvc/thumbnail_view.js"></script>
+<script src="js/mvc/timeline_view.js"></script>
+<script src="js/mvc/track_popup.js"></script>
+<script src="js/mvc/upload_view.js"></script>
+<script src="js/mvc/video_popup.js"></script>
+<script src="js/mvc/map_vid.js"></script>
+<script src="js/mvc/geof_cntrl.js"></script>
+
+<!-- ------------------------------------- -->
+<!-- Start index file javascript code here -->
+
+<script type="text/javascript">
+
+var Geof = Geof || {};
+Geof.webservice='geof';
+
+Geof.show_test = false;
+Geof.initialized = false;
+Geof.isFirstShow = true;
+
+Geof.stats = {};
+Geof.dash = {};
+
+$(function() {
+    // Disable caching of AJAX responses
+    $.ajaxSetup ({cache:false});
+
+    GLocal.load();
+
+    var pOpts = {view:'#leftViewSlideout'};
+    PanelMgr.initialize(pOpts);
+
+    zip.workerScriptsPath = "tp/zip/";
+
+    Geof.menuctrl.setControl("spanMenu","divGeofContent");
+    Geof.cntrl.profile.setControl("spanProfile");
+    Geof.recorder.setControl("spanRecorder");
+    Geof.notifier.setControl('spanNotifier');
+
+    TransMgr.setControl("spanTransmit");
+
+    var loginButtonCallback = function() {
+        if (Geof.session.sessionId || false) {
+            Geof.cntrl.search.clearSearch();
+            Geof.menuctrl.setMenu('main');
+            $("#btnLoginIcon").title = "Login";
+            Geof.session.logout();
+        } else {
+            loginCallback(false);
+        }
+    };
+
+    Geof.login.setControl({
+        container:'spanLogin',
+        login_click: loginButtonCallback,
+        login_callback:loginCallback,
+        must_use_rsa:true
+    });
+
+
+    $( '#mainBody' ).tooltip();
+
+    Geof.photo_popup = new PhotoPopup('mainBody', null);
+    Geof.map_popup = new GMapPopup('mainBody');
+    Geof.video_popup = new VideoPopup('mainBody');
+    Geof.track_popup = new TrackPopup('mainBody');
+
+});
+
+function loginCallback(isLoggedIn, err_msg) {
+    Gicon.toggleActive('btnLoginIcon', isLoggedIn);
+    Geof.logged_in = isLoggedIn;
+    var $usr_name = $("#usr_name");
+    if ( isLoggedIn ) {
+
+        Geof.login.hide();
+
+        $usr_name.text(Geof.session.usrName);
+        Geof.recorder.populateList();
+
+        $("#btnLoginIcon").title = "Log Out";
+        if (Geof.isFirstShow ) {
+            Geof.menuctrl.setStage("divMenu");
+        } else {
+            Geof.menuctrl.change(Geof.menuctrl.cur_menu)
+        }
+        Geof.isFirstShow = false;
+        Geof.notifier.start(true);
+
+        Transaction.post( GRequest.build("configuration","read",null,{}) , function(req){
+            var jobj = JsUtil.filter(req.data, {name:'show_test'});
+            if (jobj || false ) {
+                Geof.recorder.show_test = (jobj.length == 1 && jobj[0].value == 'true');
+            }
+        });
+
+    } else {
+        $usr_name.text("----- -----");
+        Geof.menuctrl.setCurrentMenu({type:'menu',name:'main'});
+        Geof.menuctrl.hideAll();
+        Geof.login.show(err_msg);
+        Geof.notifier.stop();
+    }
+
+    Geof.menuctrl.enableButtons(isLoggedIn);
+}
+
+</script>
+
+</head>
+<body id="mainBody" class="margin_zero" >
+<div id="divHeaderBar" class="headerbar margin_zero">
+    <span class="iconLeft margin_zero" id="spanMenu"></span>
+    <span class="iconRight margin_zero" id="spanLogin"></span>
+    <span class="iconRight margin_zero" id="spanTransmit"></span>
+    <span class="iconRight margin_zero" id="spanNotifier"></span>
+    <span class="iconRight margin_zero" id="spanRecorder"></span>
+    <span class="iconRight margin_zero" id="spanProfile"></span>
+</div>
+<div id="divGeofContent" class="geofcontent"></div>
+</body>
+</html>

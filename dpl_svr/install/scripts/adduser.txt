@@ -1,0 +1,7 @@
+ sudo ./dpl_admin.sh -a createUsr -u jefe -p jefepwd -f jefe -l botero -e j.b@geofixated.org
+
+echo -e "test123\ntest123\n" | sudo passwd test2
+REM sudo su -c "useradd test -s /bin/bash -m -g adm"
+sudo su -c "useradd test2 -s /bin/bash -m -g adm"
+
+

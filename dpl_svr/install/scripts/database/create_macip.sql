@@ -1,0 +1,20 @@
+INSERT INTO MACIP (ipaddress,macaddress) VALUES ('192.168.1.211','52:54:00:58:b5:e1');
+INSERT INTO MACIP (ipaddress,macaddress) VALUES ('192.168.1.212','52:54:00:36:0b:4a');
+INSERT INTO MACIP (ipaddress,macaddress) VALUES ('192.168.1.213','52:54:00:57:33:1d');
+INSERT INTO MACIP (ipaddress,macaddress) VALUES ('192.168.1.214','52:54:00:18:ea:14');
+INSERT INTO MACIP (ipaddress,macaddress) VALUES ('192.168.1.215','52:54:00:4d:c2:2d');
+INSERT INTO MACIP (ipaddress,macaddress) VALUES ('192.168.1.216','52:54:00:36:cf:2b');
+INSERT INTO MACIP (ipaddress,macaddress) VALUES ('192.168.1.217','52:54:00:3f:7b:d6');
+INSERT INTO MACIP (ipaddress,macaddress) VALUES ('192.168.1.218','52:54:00:71:c5:2c');
+INSERT INTO MACIP (ipaddress,macaddress) VALUES ('192.168.1.219','52:54:00:3e:c9:06');
+INSERT INTO MACIP (ipaddress,macaddress) VALUES ('192.168.1.220','52:54:00:36:06:29');
+INSERT INTO MACIP (ipaddress,macaddress) VALUES ('192.168.1.221','52:54:00:6f:6e:1e');
+INSERT INTO MACIP (ipaddress,macaddress) VALUES ('192.168.1.222','52:54:00:3d:d8:66');
+INSERT INTO MACIP (ipaddress,macaddress) VALUES ('192.168.1.223','52:54:00:2f:23:8a');
+INSERT INTO MACIP (ipaddress,macaddress) VALUES ('192.168.1.224','52:54:00:6a:82:cc');
+INSERT INTO MACIP (ipaddress,macaddress) VALUES ('192.168.1.225','52:54:00:66:92:f7');
+INSERT INTO MACIP (ipaddress,macaddress) VALUES ('192.168.1.226','52:54:00:0c:61:50');
+INSERT INTO MACIP (ipaddress,macaddress) VALUES ('192.168.1.227','52:54:00:7b:07:a1');
+INSERT INTO MACIP (ipaddress,macaddress) VALUES ('192.168.1.228','52:54:00:77:2a:e1');
+INSERT INTO MACIP (ipaddress,macaddress) VALUES ('192.168.1.229','52:54:00:5f:06:f2');
+

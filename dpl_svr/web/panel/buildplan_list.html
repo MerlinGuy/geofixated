@@ -1,0 +1,129 @@
+<div class="listDetail font12" id="Dom_list">
+    <table><tr>
+        <td class="content_panelB">
+            <div class="buttonBar">
+                <span class="ui-icon icon_geof_new_enable iconLeft" id="btnNewBuildplan"  title="New Buildplan"></span>
+                <span class="ui-icon icon_geof_copy iconLeft" id="btnCopyBuildplan"  title="Copy Buildplan"></span>
+                <span class="ui-icon icon_geof_build iconLeft" id="btnBPCreateDomain"  title="Build Domain"></span>
+                <span class="ui-icon icon_geof_discard iconLeft" id="btnDiscardBuildplan" title="Delete Buildplan"></span>
+                <span class="ui-icon icon_geof_refresh_enable iconRight" id="btnRefreshBuildplan" title="Refresh Buildplan"></span>
+            </div>
+            <div class="pnlListItems">
+                <div class="list_header">
+                    <label class="hdrLabelLeft flw130">Name</label>
+                    <label class="hdrLabelLeft">Status</label>
+                    <label class="hdrLabelRight"> id</label>
+                </div>
+                <div class="pnl_listBlockNoWidth w280" id="pnl_listBlock" >
+                    <ol id="olBuildplans" class="OlStdSelect2"></ol>
+                </div>
+            </div>
+        </td>
+        <td class="content_panelB">
+            <div class="dialogHeader">
+                <span class="ui-icon icon_geof_save iconRight" id="edit_buildplan_save" title="Save Buildplan Changes"></span>
+                <label class="stdlabel" >ID:<label id="buildplan_id"></label></label>
+            </div>
+            <div class="editLine">
+                <label class="stdlabel">Name:</label><input type="text" spellcheck="false" id="buildplan_name" size="28" >
+                <label class="stdlabel">Status:</label>
+                <select size="1" class="font12" id="buildplan_status" >
+                    <option value="1" selected>Active</option>
+                    <option value="0">Disabled</option>
+                    <option value="2">Retired</option>
+                </select>
+            </div>
+            <div class="editLineH16">
+                <label class="stdlabel" for="cbDemoBuildplan">Set buildplan as demo template</label>
+                <input type="checkbox" id="cbDemoBuildplan" class="mt8">
+            </div>
+
+            <div class="inline2ib">
+                 <label class="stdlabel floatLeft0">Storage Location:</label>
+                 <select id="buildplan_storagelocid" class="buildplan floatLeft" size="1"></select>
+                 <span class="ui-icon icon_geof_refresh_enable iconLeft" id="btnRefreshStorageLoc" title="Refresh Storage Location"></span>
+            </div>
+
+            <div class="editLine">
+                <label class="stdlabel">Description:</label><br>
+                <textarea maxlength="512" spellcheck="false" id="buildplan_description" cols="65" rows="3"></textarea><br>
+            </div>
+            <hr>
+            <div id="imgcfg_section" class="w520">
+                <h3>Domains and Image Files</h3>
+                <div class="inline2">
+                    <div class="inline3">
+                        <label class="stdlabel">Domain:</label>
+                        <select id="buildplan_domainname" class="buildplan" size="1"></select>
+                    </div>
+
+                    <div class="inline2">
+                        <label class="imglabel floatLeft">Image File:</label>
+                        <label class="imagefile floatLeft" id="image_name"></label>
+                        <span class="ui-icon icon_geof_edit iconRight" id="btnChangeImage" title="Change Image File"></span>
+                    </div>
+                </div>
+                <h3>Install Packages</h3>
+                <div class="inline2">
+                    <label class="stdlabel floatLeft">Package Name List:</label><br>
+                    <textarea rows="11" cols="67" spellcheck="false" id="buildplan_packages"></textarea>
+                </div>
+                <h3>Post Package Checks</h3>
+                <div class="inline2">
+                    <label class="stdlabel floatLeft">Checks:</label><br>
+                    <textarea rows="11" cols="67" spellcheck="false" id="buildplan_checks"></textarea>
+                </div>
+                <h3>Wget files</h3>
+                <div class="inline2">
+                    <label class="stdlabel floatLeft">Wget File List:</label><br>
+                    <textarea rows="11" cols="67" spellcheck="false" id="buildplan_wgetfiles"></textarea>
+                </div>
+                <h3>Install files</h3>
+                <div class="inline2">
+                    <div class="inline2">
+                        <label class="stdlabel floatLeft">New File:</label>
+                        <label class="installfile floatLeft" id="install_file_name"></label>
+                        <div id="pbInstallUpload" class="pbar100 floatLeft"></div>
+                        <span class="ui-icon icon_geof_upload iconRight" id="uploadInstallFile" title="Upload Install File"></span>
+                        <span class="ui-icon icon_geof_new_enable iconRight" id="selectInstallFile" title="Select Install File"></span>
+                    </div>
+                    <div class="inline2">
+                        <label class="imglabel floatLeft">Uploaded</label>
+                        <span class="ui-icon icon_geof_discard iconRight" id="discardInstallFile" title="Delete File"></span>
+                        <input type="file" id="installFileSelector" name="installFileSelector[]" style="display:none;"/>
+                    </div>
+                    <div class="dplInstallItems">
+                        <div class="list_header">
+                            <label class="hdrLabelLeft flw200">Name</label>
+                            <label class="hdrLabelLeft">Size</label>
+                            <label class="hdrLabelRight">Id</label>
+                        </div>
+                        <ol id="olBpInstallfiles" class="OlInstallList"></ol>
+                    </div>
+                </div>
+                <h3>Install Commands</h3>
+                <div class="inline2">
+                    <label class="stdlabel floatLeft">Commands:</label><br>
+                    <textarea rows="11" cols="67" spellcheck="false" id="buildplan_cmds"></textarea>
+                </div>
+            </div>
+
+            <div class="innerPopup borderGreen hidden" id="imagelist">
+                <div class="buttonBar">
+                    <label class="imglabel floatLeft">Available Images:</label>
+                    <span class="ui-icon icon_geof_save iconRight" id="btnSaveBpImage"  title="Select Image"></span>
+                    <span class="ui-icon icon_geof_cancel_enable iconRight" id="btnCancelBpImages" title="Close"></span>
+                </div>
+
+                <div class="dplListItems">
+                    <div class="list_header">
+                        <label class="hdrLabelLeft flw130">Name</label>
+                        <label class="hdrLabelLeft">Status</label>
+                        <label class="hdrLabelRight">Id</label>
+                    </div>
+                    <ol id="olBpImages" class="OlImageList"></ol>
+                </div>
+            </div>
+        </td>
+    </tr></table>
+</div>

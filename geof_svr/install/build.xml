@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="geofsvr" default="compile" basedir="."> 
+	
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="debug" value="on"/>
+
+    <property name="user" value="${arg0}"/>
+	<property name="pwd" value="${arg1}"/>
+	<property name="gserver" value="${arg2}"/>
+	<property name="code.root" value="${arg3}"/>
+	
+	<property name="tomcat" value="tomcat6"/>
+	
+	<property name="build.dir" value="${code.root}/google_dev/build"/>
+	<property name="local.dir" value="${code.root}/google_dev/geofixated"/>
+	
+	<path id="classpath_local">
+        <fileset dir="${local.dir}/core_svr/lib" includes="**/*.jar"/>
+    </path>
+
+	<property name="svr.dir" value="${local.dir}/geof_svr"/>
+	<property name="svr.src" value="${svr.dir}/src"/>
+	<property name="svr.lib" value="${svr.dir}/lib"/>
+	
+	<property name="core.dir" value="${local.dir}/geof_core"/>
+	<property name="core.src" value="${core.dir}/src"/>
+	<property name="core.lib" value="${core.dir}/lib"/>
+	
+	<property name="build.core.src" value="${build.dir}/core/src"/>
+	<property name="build.core.lib" value="${build.dir}/core/lib"/>
+	
+	<property name="build.svr.src" value="${build.dir}/svr/src"/>
+	<property name="build.svr.lib" value="${build.dir}/svr/lib"/>
+			
+	<property name="jar.dir" value="${build.dir}/classes"/>
+	
+	<property name="local.webapp" value="${build.dir}/webapp"/>
+	<property name="local.src" value="#{svr.dir}/src"/>
+	<property name="local.java.lib" value="#{svr.dir}/lib"/>
+	<property name="local.website" value="${build.dir}/website"/>
+
+	<property name="geof.dir" value="${build.dir}/geof"/>
+	<property name="conf.dir" value="${build.dir}/conf"/>
+	<property name="prod.dir" value="${build.dir}/prod"/>
+	<property name="webinf.dir" value="${build.dir}/WEB-INF"/>
+		
+	<property name="geof.install" value="${build.dir}/geof_ws_install.tar.gz"/>
+			
+	<property name="svn_svr" value="http://pi/svn/geof/geofixated/geof_svr"/>
+	<property name="svn_core" value="http://pi/svn/geof/geofixated/geof_core"/>
+	<property name="svn_webapp" value="http://pi/svn/geof/geofixated/webapp"/>
+	<property name="svn_website" value="http://pi/svn/geof/geofixated/geof_website"/>
+	<property name="svn_sql" value="http://pi/svn/geof/geofixated/scripts/database"/>
+								
+	<property name="install.dest" value="/home/${user}/geof"/> 
+	
+	<property name="jar.file" value="geof.jar"/>
+	<property name="web.dir" value="webapp"/>
+
+	<path id="svnant.class.path">
+  		<pathelement location="${code.root}/svnant131/lib/svnant.jar" />
+  		<pathelement location="${code.root}/svnant131/lib/svnClientAdapter.jar" />
+  		<pathelement location="${code.root}/svnant131/lib/svnjavahl.jar" />
+  		<pathelement location="${code.root}/svnant131/lib/svnkit.jar" />
+ 	</path>
+	
+	<typedef resource="org/tigris/subversion/svnant/svnantlib.xml" classpathref="svnant.class.path" /> 
+	
+	<svnSetting svnkit="false" javahl="false" id="svn.settings" username="${user}" password="${pwd}" />
+						
+	<path id="classpath">
+        <fileset dir="${svr.lib}" includes="**/*.jar"/>
+    </path>
+    
+	<path id="external.lib.jars">
+	    <fileset dir="${svr.lib}">
+	        <include name="*.jar"/>
+	    </fileset>
+	    <fileset dir="${core.lib}">
+	        <include name="*.jar"/>
+	    </fileset>
+	</path>	
+		
+	<target name="clean_tar">
+        <delete dir="${geof.dir}"/>
+        <delete dir="${svr.src}"/>
+    </target>
+    
+	<target name="clean">
+        <delete dir="${build.dir}" />
+    </target>
+
+	<target name="checkout" depends="clean">
+		<svn refid="svn.settings" >
+   			<export srcUrl="${svn_svr}/src" destPath="${build.svr.src}"/>
+   			<export srcUrl="${svn_core}/src" destPath="${build.core.src}"/>
+ 		</svn>
+	    <exec executable="svnversion" outputproperty="svnversion"/>
+	    <replaceregexp file="${build.core.src}/org/geof/request/VersionRequest.java"
+               match="svn_version"
+               replace="${svnversion}"
+               byline="true"
+		/>
+	</target>
+ 	
+	<!-- 
+	<target name="buildinfo" depends="checkout">
+	    <exec executable="svnversion" outputproperty="svnversion"/>
+	    <replaceregexp file="${build.core.src}/org/geof/request/VersionRequest.java"
+               match="svn_version"
+               replace="${svnversion}"
+               byline="true"
+		/>
+	</target>
+	 -->
+	 
+	<target name="full_checkout">
+		<svn refid="svn.settings" >
+   			<export srcUrl="${svn_svr}/src" destPath="${build.svr.src}"/>
+   			<export srcUrl="${svn_svr}/lib" destPath="${build.svr.lib}"/>
+   			<export srcUrl="${svn_core}/src" destPath="${build.core.src}"/>
+ 			<export srcUrl="${svn_core}/lib" destPath="${build.core.lib}"/>
+ 		</svn>
+ 	</target>
+ 	
+	<target name="compile" depends="clean,checkout">
+        <mkdir dir="${build.dir}" />
+        <mkdir dir="${jar.dir}" />
+        <javac srcdir="${build.dir}/svr/src:${build.dir}/core/src" destdir="${jar.dir}" 
+            classpathref="classpath" includeantruntime="false">
+        	<classpath refid="external.lib.jars"/> 
+        </javac>
+    </target>
+	
+    <target name="jar" depends="compile">
+        <jar destfile="${build.dir}/${jar.file}" basedir="${jar.dir}"></jar>
+    </target>
+	
+    <target name="install" depends="jar">
+    	<copy file="${build.dir}/${jar.file}" todir="${install.dest}/WEB-INF/lib/." />
+    </target>
+
+    <target name="compile_debug" depends="clean,checkout">
+        <mkdir dir="${build.dir}" />
+        <mkdir dir="${jar.dir}" />
+        <javac srcdir="${build.svr.src}:${build.core.src}" destdir="${jar.dir}" 
+            		classpathref="classpath" includeantruntime="false" 
+            		debug="true" debuglevel="lines,vars,source">
+        	<classpath refid="external.lib.jars"/> 
+        </javac>
+    </target>
+	
+    <target name="jar_debug" depends="compile_debug">
+        <jar destfile="${build.dir}/${jar.file}" basedir="${jar.dir}"></jar>
+    </target>
+
+    <target name="install_debug" depends="jar_debug">
+       	<copy file="${build.dir}/${jar.file}" todir="/home/${user}/geof/WEB-INF/lib/." />  
+       	<antcall target="restart_tomcat">       	    
+       	</antcall>     	
+    </target>
+    
+    <target name="compile_debug_dev" depends="clean">
+        <mkdir dir="${build.dir}" />
+        <mkdir dir="${jar.dir}" />
+        <javac srcdir="${core.src}:${svr.src}" destdir="${jar.dir}" 
+            		classpathref="classpath" includeantruntime="false" 
+            		debug="true" debuglevel="lines,vars,source">
+        	<classpath refid="external.lib.jars"/> 
+        </javac>
+    </target>
+	
+    <target name="jar_debug_dev" depends="compile_debug_dev">
+        <jar destfile="${build.dir}/${jar.file}" basedir="${jar.dir}"></jar>
+    </target>
+
+    <target name="install_debug_dev" depends="jar_debug_dev">
+       	<copy file="${build.dir}/${jar.file}" todir="/home/${user}/geof/prod/WEB-INF/lib/." />  
+       	<antcall target="restart_tomcat">       	    
+       	</antcall>     	
+    </target>
+        
+    <target name="restart_tomcat" >
+    	<sshexec host="${gserver}"
+    		username="${user}"
+    		password="${pwd}"
+    		trust="true"
+    		command="sudo service ${tomcat} restart"/>
+    	<antcall target="print_time"/>
+    </target>
+	
+	<target name="print_time">
+	  <tstamp>
+	    <format property="current.time" pattern="MM/dd/yyyy hh:mm:ss aa" />
+	  </tstamp>
+	  <echo message="${current.time}" />
+	</target>    
+	
+    <target name="upl_geof_jar_local" depends="clean">
+        <mkdir dir="${build.dir}" />
+        <mkdir dir="${jar.dir}" />
+        <javac destdir="${jar.dir}" classpathref="classpath_local" includeantruntime="false" debug="${debug}">
+        	<src path="${local.dir}/core_svr/src"/>
+        	<src path="${local.dir}/geof_svr/src"/>
+    	</javac>
+    	<jar destfile="${build.dir}/${jar.file}" basedir="${jar.dir}" />
+		<scp file="${build.dir}/${jar.file}" todir="${user}@${gserver}:/home/${user}/${jar.file}" password="${pwd}" trust="true" />
+    	<sshexec host="${gserver}"
+    		username="${user}"
+    		password="${pwd}"
+    		trust="true"
+    		command="sudo cp -f /home/${user}/${jar.file} /var/lib/${tomcat}/webapps/geof/WEB-INF/lib/${jar.file}"/>
+    	<antcall target="restart_tomcat"></antcall>
+    </target>	
+	
+    <target name="inst_jars" depends="jar" >
+    	<copy todir="${install.dest}/WEB-INF/lib">
+    	  <fileset dir="${src.lib}">
+    	    <include name="*.jar"/> 
+    	  </fileset>
+    	</copy>
+    	<copy todir="${install.dest}/conf">
+    	  <fileset dir="${web.dir}/conf">
+    	    <include name="*.properties"/> 
+    	  </fileset>
+    	</copy>
+    	<copy todir="${install.dest}/WEB-INF">
+    	  <fileset dir="${web.dir}">
+    	    <include name="web.xml"/> 
+    	  </fileset>
+    	</copy>
+    </target>
+	
+    <target name="install_all" depends="install,inst_jars">
+    </target>
+	
+    <target name="install_test" >
+    	<delete dir="${test.dest}" />
+    	<mkdir dir="${test.dest}" />
+    	
+    	<copy todir="${test.dest}">
+    	  <fileset dir="${test.src}">
+    	    <exclude name="**/.svn/**"/> 
+    	  </fileset>
+    	</copy>
+    </target>
+	
+    <target name="run" depends="jar">
+        <java jar="bin/jar/geof.jar" fork="true"/>
+    </target>
+
+<!-- SVN based projects starts here -->
+    
+	<target name="export_tar"  depends="clean_tar" >
+	    <mkdir dir="${geof.dir}"/>
+	    <svn refid="svn.settings" >
+   			<export srcUrl="${svn_webapp}/conf" destPath="${conf.dir}"/>
+			<export srcUrl="${svn_svr}/src" destPath="${svr.src}"/>
+   			<export srcUrl="${svn_svr}/lib" destPath="${src.lib}"/>
+   			<export srcUrl="${svn_webapp}/web.xml" destPath="${webinf.dir}/web.xml"/>
+   		</svn>
+ 	</target>
+ 	
+	<target name="compile_tar" depends="export_tar">
+        <delete dir="${src.lib}/${jar.file}"/>
+	    <delete dir="${build.dir}"/>
+	    <mkdir dir="${build.dir}"/>
+	    <mkdir dir="${webinf.dir}/classes"/>
+	    <javac srcdir="${work.dir}/src" destdir="${build.dir}" classpathref="classpath" includeantruntime="false">
+        	<classpath refid="external.lib.jars"/> 
+        </javac>
+        <jar destfile="${build.dir}/${jar.file}" basedir="${build.dir}"/>
+        <copy file="${build.dir}/${jar.file}" todir="${src.lib}/." />        
+    </target>
+    
+	<target name="create_tar" depends="compile_tar" >
+	    <mkdir dir="${geof.dir}/logs"/>
+	    <delete dir="${prod.dir}"/>
+	    <delete file="${geof.install}"/>
+	    <delete>
+			<fileset dir="${work.dir}">
+	        	<include name="*.sql"/>
+	      </fileset>
+	    </delete>
+	    <svn refid="svn.settings" >
+	    	<export srcUrl="${svn_website}" destPath="${prod.dir}"/>
+	    	<export srcUrl="${svn_sql}/setup_geofdb.sql" destPath="${work.dir}/setup_geofdb.sql"/>
+	    	<export srcUrl="${svn_sql}/create_geofdb.sql" destPath="${work.dir}/create_geofdb.sql"/>
+	    	<export srcUrl="${svn_sql}/create_geofdb_tables.sql" destPath="${work.dir}/create_geofdb_tables.sql"/>
+	    </svn>
+   		<tar destfile="${geof.install}" basedir="${geof.dir}" compression="gzip"/>
+   		<scp file="${geof.install}" todir="${fcr_install}" password="${arg2}" trust="true"/>
+   		<scp file="${work.dir}/setup_geofdb.sql" todir="${fcr_install}" password="${arg2}" trust="true"/>
+   		<scp file="${work.dir}/create_geofdb.sql" todir="${fcr_install}" password="${arg2}" trust="true"/>
+   		<scp file="${work.dir}/create_geofdb_tables.sql" todir="${fcr_install}" password="${arg2}" trust="true"/> 		
+ 	</target>
+
+	<target name="svr_create_tar" depends="compile_tar" >
+	    <mkdir dir="${geof.dir}/logs"/>
+	    <delete dir="${prod.dir}"/>
+	    <delete file="${geof.install}"/>
+	    <delete>
+			<fileset dir="${fcr_install.dir}">
+	        	<include name="*.sql"/>
+	      </fileset>
+	    </delete>
+	    <svn refid="svn.settings" >
+	    	<export srcUrl="${svn_website}" destPath="${prod.dir}"/>	    	
+	    	<export srcUrl="${svn_sql}/setup_geofdb.sql" destPath="${fcr_install.dir}/setup_geofdb.sql"/>
+	    	<export srcUrl="${svn_sql}/create_geofdb.sql" destPath="${fcr_install.dir}/create_geofdb.sql"/>
+	    	<export srcUrl="${svn_sql}/create_geofdb_tables.sql" destPath="${fcr_install.dir}/create_geofdb_tables.sql"/>
+		</svn>
+   		<tar basedir="${geof.dir}" destfile="${geof.tar.install}" compression="gzip"/>
+    </target>
+
+</project>

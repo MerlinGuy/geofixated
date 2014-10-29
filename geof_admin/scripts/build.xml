@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="geof_admin" default="compile" basedir="."> 
+	
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="user" value="${arg0}"/>
+	<property name="pwd" value="${arg1}"/>
+	
+	<property name="workspace.dir" value="/home/jeff/dev/google_test/geofixated"/>
+	
+	<property name="adm.dir" value="${workspace.dir}/geof_admin"/>
+	<property name="adm.src" value="${adm.dir}/src"/>
+	<property name="adm.script" value="${adm.dir}/scripts"/>
+	<property name="adm.lib" value="${workspace.dir}/geof_svr/lib"/>
+		
+	<property name="core.dir" value="${workspace.dir}/geof_core"/>
+	<property name="core.src" value="${core.dir}/src"/>
+	<property name="core.lib" value="${core.dir}/lib"/>
+	
+	<property name="build.dir" value="${adm.dir}/bin/build"/>
+		
+	<property name="jar.dir" value="${build.dir}/classes"/>
+	
+	<property name="svn_core" value="https://geofixated.googlecode.com/svn/trunk/geof_core"/>
+	<property name="svn_adm" value="https://geofixated.googlecode.com/svn/trunk/geof_admin"/>
+								
+	<property name="install.dest" value="/home/jeff/geof"/> 
+	
+	<property name="jar.file" value="geof_admin.jar"/>
+
+	<path id="svnant.class.path">
+  		<pathelement location="/home/jeff/dev/svnant131/lib/svnant.jar" />
+  		<pathelement location="/home/jeff/dev/svnant131/lib/svnClientAdapter.jar" />
+  		<pathelement location="/home/jeff/dev/svnant131/lib/svnjavahl.jar" />
+  		<pathelement location="/home/jeff/dev/svnant131/lib/svnkit.jar" />
+ 	</path>
+	
+	<typedef resource="org/tigris/subversion/svnant/svnantlib.xml" classpathref="svnant.class.path" /> 
+	
+	<svnSetting svnkit="false" javahl="false" id="svn.settings" username="${user}" password="${pwd}" />	
+					
+	<path id="classpath">
+        <fileset dir="${adm.lib}" includes="**/*.jar"/>
+    </path>
+    
+	<target name="clean">
+        <delete dir="${build.dir}" />
+    </target>
+
+	<target name="checkout">
+		<svn refid="svn.settings" >
+   			<export srcUrl="${svn_adm}/src" destPath="${build.adm.src}"/>
+   			<export srcUrl="${svn_core}/src" destPath="${build.core.src}"/>
+   			<export srcUrl="${svn_adm}/scripts/geof_admin.sh" destPath="${build.dir}/."/>
+   		</svn>
+ 	</target>
+ 	
+	<target name="full_checkout">
+		<svn refid="svn.settings" >
+   			<export srcUrl="${svn_adm}/src" destPath="${adm.src}"/>
+   			<export srcUrl="${svn_adm}/lib" destPath="${adm.lib}"/>
+   			<export srcUrl="${svn_core}/src" destPath="${core.src}"/>
+ 			<export srcUrl="${svn_core}/lib" destPath="${core.lib}"/>
+ 		</svn>
+ 	</target>
+ 	
+	<target name="compile" depends="clean,checkout">
+        <mkdir dir="${build.dir}" />
+        <mkdir dir="${jar.dir}" />
+        <javac srcdir="${core.src}:${adm.src}" destdir="${jar.dir}" 
+            classpathref="classpath" includeantruntime="false">
+        </javac>
+    </target>
+	
+    <target name="jar" depends="compile">
+        <jar destfile="${build.dir}/${jar.file}" basedir="${jar.dir}"></jar>
+    </target>
+	
+    <target name="install" depends="jar">
+    	<copy file="${build.dir}/${jar.file}" todir="${install.dest}/WEB-INF/lib/." />
+    	<copy file="${build.dir}/geof_admin.sh" todir="${install.dest}/WEB-INF/lib/." />
+    </target>
+
+    <target name="compile_debug" depends="clean,checkout">
+        <mkdir dir="${build.dir}" />
+        <mkdir dir="${jar.dir}" />
+        <javac srcdir="${core.src}:${adm.src}" destdir="${jar.dir}" 
+            		classpathref="classpath" includeantruntime="false" 
+            		debug="true" debuglevel="lines,vars,source">
+        </javac>
+    </target>
+	
+    <target name="jar_debug" depends="compile_debug">
+        <jar destfile="${build.dir}/${jar.file}" basedir="${jar.dir}"></jar>
+    </target>
+
+    <target name="install_debug" depends="jar_debug">
+       	<copy file="${build.dir}/${jar.file}" todir="/home/jeff/geof/WEB-INF/lib/." />  
+    	<copy file="${build.dir}/geof_admin.sh" todir="${install.dest}/WEB-INF/lib/." />
+    </target>
+    
+    <target name="compile_debug_dev" depends="clean">
+        <mkdir dir="${build.dir}" />
+        <mkdir dir="${jar.dir}" />
+        <javac srcdir="${core.src}:${adm.src}" destdir="${jar.dir}" 
+            		classpathref="classpath" includeantruntime="false" 
+            		debug="true" debuglevel="lines,vars,source">
+        </javac>
+    </target>
+	
+    <target name="compile_admin" depends="clean">
+        <mkdir dir="${build.dir}" />
+        <mkdir dir="${jar.dir}" />
+        <javac srcdir="${core.src}:${adm.src}" destdir="${jar.dir}" 
+            		classpathref="classpath" includeantruntime="false" 
+    		debug="true" debuglevel="lines,vars,source">
+        </javac>
+    </target>
+    <target name="jar_admin" depends="compile_admin">
+        <jar destfile="${build.dir}/${jar.file}" basedir="${jar.dir}"></jar>
+   		<scp file="${build.dir}/${jar.file}" todir="jeff@dev205:/home/jeff/." password="${arg1}" trust="true"/>
+    </target>
+	
+    <target name="jar_debug_dev" depends="compile_debug_dev">
+        <jar destfile="${build.dir}/${jar.file}" basedir="${jar.dir}"></jar>
+    </target>
+
+    <target name="install_debug_dev" depends="jar_debug_dev">
+       	<copy file="${build.dir}/${jar.file}" todir="/home/jeff/geof/WEB-INF/lib/." />  
+    	<copy file="${adm.script}/geof_admin.sh" todir="${install.dest}/WEB-INF/lib/." />
+    </target>
+        
+</project>

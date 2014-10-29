@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/geof_lib"/>
+	<classpathentry kind="lib" path="/home/jeff/dev/geof/geofixated/core_svr/lib/commons-codec-1.7.jar"/>
+	<classpathentry kind="lib" path="/home/jeff/dev/geof/geofixated/core_svr/lib/commons-io-2.4.jar"/>
+	<classpathentry kind="lib" path="/home/jeff/dev/geof/geofixated/core_svr/lib/dsn.jar"/>
+	<classpathentry kind="lib" path="/home/jeff/dev/geof/geofixated/core_svr/lib/imap.jar"/>
+	<classpathentry kind="lib" path="/home/jeff/dev/geof/geofixated/core_svr/lib/jai_codec.jar"/>
+	<classpathentry kind="lib" path="/home/jeff/dev/geof/geofixated/core_svr/lib/jai_core.jar"/>
+	<classpathentry kind="lib" path="/home/jeff/dev/geof/geofixated/core_svr/lib/json.jar"/>
+	<classpathentry kind="lib" path="/home/jeff/dev/geof/geofixated/core_svr/lib/mailapi.jar"/>
+	<classpathentry kind="lib" path="/home/jeff/dev/geof/geofixated/core_svr/lib/metadata-extractor-2.6.2.jar"/>
+	<classpathentry kind="lib" path="/home/jeff/dev/geof/geofixated/core_svr/lib/pop3.jar"/>
+	<classpathentry kind="lib" path="/home/jeff/dev/geof/geofixated/core_svr/lib/postgis-1.4.0SVN.jar"/>
+	<classpathentry kind="lib" path="/home/jeff/dev/geof/geofixated/core_svr/lib/postgresql-8.3-604.jdbc4.jar"/>
+	<classpathentry kind="lib" path="/home/jeff/dev/geof/geofixated/core_svr/lib/servlet-api.jar"/>
+	<classpathentry kind="lib" path="/home/jeff/dev/geof/geofixated/core_svr/lib/smack.jar"/>
+	<classpathentry kind="lib" path="/home/jeff/dev/geof/geofixated/core_svr/lib/smackx.jar"/>
+	<classpathentry kind="lib" path="/home/jeff/dev/geof/geofixated/core_svr/lib/smtp.jar"/>
+	<classpathentry kind="lib" path="/home/jeff/dev/geof/geofixated/core_svr/lib/xmpcore.jar"/>
+	<classpathentry kind="lib" path="/home/jeff/dev/geof/geofixated/core_svr/lib/bcprov-jdk15on-149.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

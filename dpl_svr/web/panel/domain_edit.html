@@ -1,0 +1,52 @@
+<div id="editDomain" title="Edit Domain" class="hidden font12">
+    <div class="dialogHeader">
+        <span class="ui-icon icon_geof_save iconRight" id="edit_domain_save" title="Save Domain Changes"></span>
+        <label class="stdlabel" >ID:<label id="domain_id"></label></label>
+    </div>
+    <div class="editLine">
+        <label class="stdlabel">Name:</label><input type="text" spellcheck="false" id="domain_name" size="28" >
+        <label class="stdlabel">Status:</label>
+        <select size="1" class="font12" id="domain_status" >
+            <option value="0" selected>Offline</option>
+            <option value="1" >Running</option>
+            <option value="2">Retired</option>
+        </select>
+    </div>
+    <div class="editLine">
+        <label class="stdlabel">Start Date</label>
+        <input type="text" id="domain_startdate" size="16" >
+    </div>
+
+    <div class="editLine">
+        <label class="stdlabel">End Date</label>
+        <input type="text" id="domain_enddate" size="16" >
+    </div>
+
+    <div class="editLine">
+        <label class="stdlabel">XML Path</label>
+        <input type="text" spellcheck="false" id="domain_xmlplath" size="16" >
+    </div>
+
+    <div class="editLine">
+        <label class="stdlabel">Description:</label><br>
+        <textarea maxlength="512" spellcheck="false" id="domain_description" cols="65" rows="3"></textarea><br>
+    </div>
+    <hr>
+    <div class="inline2">
+        <label class="imglabel floatLeft">Build Plan:</label>
+        <label class="imagefile floatLeft" id="buildplan_name"></label>
+        <span class="ui-icon icon_geof_edit iconRight" id="btnChangeBuildplan" title="Change Buildplan"></span>
+    </div>
+
+    <label class="imglabel floatLeft">Image Files:</label>
+    <div class="pnlListItems">
+        <div class="list_header">
+            <label class="hdrLabelLeft flw130">Name</label>
+            <label class="hdrLabelLeft">Status</label>
+            <label class="hdrLabelRight"> id</label>
+        </div>
+        <div class="pnl_listBlockNoWidth w280" id="pnl_listBlock" >
+            <ol id="olDomImageFiles" class="OlStdSelect2"></ol>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,31 @@
+<div id="editUsr" title="Edit User" class="hidden font12">
+    <div class="dialogHeader">
+        <span class="ui-icon icon_geof_save_enable geof_enabled iconRight" id="edit_usr_save" title="Save User Changes"></span>
+        <label class="stdlabel" >ID:<label id="usr_id"></label></label><br>
+        <label class="stdlabel w260 floatLeft font12Red border" id="usr_save_error"></label>
+    </div>
+    <label class="stdlabel">Login:</label><input type="text" spellcheck="false" id="usr_loginname" size="28" ><br>
+    <div class="usr_pwd mt8">
+        <span class="ui-icon icon_geof_session iconRight" id="edit_usr_updatepwd" title="Change Password"></span>
+        <label class="stdlabel flw95">Password:</label><input type="password" spellcheck="false" id="usr_password" size="18" class="mt8" ><br>
+        <label class="stdlabel flw95 floatLeft">Confirm Pwd:</label><input type="password" spellcheck="false" id="usr_password2" size="18" ><br>
+        <label class="stdlabel w260 floatLeft font12Red" id="usr_password_error"></label>
+    </div>
+    <HR>
+    <label class="stdlabel">First Name:</label><input type="text" spellcheck="false" id="usr_firstname" size="24" ><br>
+    <label class="stdlabel">Last Name:</label><input type="text" spellcheck="false" id="usr_lastname" size="24" ><br>
+    <label class="stdlabel">Initials:</label><input type="text" spellcheck="false" id="usr_initials" size="4" ><br>
+    <label class="stdlabel">Email:</label><input type="text" spellcheck="false" id="usr_email" size="40" ><br>
+    <label>Notes:</label><br>
+    <textarea maxlength="512" spellcheck="false" id="usr_notes" cols="50" rows="4"></textarea><br>
+    <label class="stdlabel">Status:</label>
+    <select size="1" class="font12" id="usr_statusid" >
+        <option value="1" selected>Normal</option>
+        <option value="2">Adjusted</option>
+        <option value="3">Disabled</option>
+        <option value="4">Locked Out</option>
+    </select><br>
+    <label class="stdlabel">Attempts:</label><input type="text" spellcheck="false" id="usr_attempts" size="4"><br>
+    <label class="stdlabel">Last Attempt:</label>
+    <input type="text" spellcheck="false" id="usr_lastattempt" size="40" value="" readonly>
+</div>

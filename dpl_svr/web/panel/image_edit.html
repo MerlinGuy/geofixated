@@ -1,0 +1,58 @@
+<div id="editImage" title="Edit Image" class="hidden font12">
+    <div class="dialogHeader">
+        <span class="ui-icon icon_geof_save iconRight" id="edit_image_save" title="Save Image Changes"></span>
+        <label class="stdlabel" >ID:<label id="image_id"></label></label>
+    </div>
+    <div class="editLine">
+        <label class="stdlabel">Name:</label><input type="text" spellcheck="false" id="image_name" size="28" >
+        <label class="stdlabel">Status:</label>
+        <select size="1" class="font12" id="image_statusid" >
+            <option value="1" selected>Active</option>
+            <option value="0">Disabled</option>
+            <option value="2">Retired</option>
+        </select>
+    </div>
+     <div class="editLine">
+        <label class="stdlabel">Last Date Cloned:</label>
+        <input type="text" id="image_lastattempt" size="28" value="" readonly>
+    </div>
+    <div class="editLine">
+        <label class="stdlabel">Description:</label><br>
+        <textarea maxlength="512" spellcheck="false" id="image_description" cols="65" rows="3"></textarea><br>
+    </div>
+    <hr>
+    <div >
+        <label class="imglabel floatLeft">Add File:</label>
+        <label id="new_image" class="new_file" />
+        <span class="ui-icon icon_geof_upload iconRight" id="uploadImage" title="Upload Image"></span>
+        <span class="ui-icon icon_geof_new_enable iconRight" id="selectImage" title="Select Image"></span>
+        <input type="file" id="imageFileSelector" name="imageFileSelector[]" style="display:none;"/>
+    </div>
+    <div class="inline">
+        <div id="pbImageUpload" class="filePbar"></div>
+    </div>
+
+    <div class="inline">
+        <label class="imglabel floatLeft">Sections Uploaded:</label>
+        <label id="dpl_file_sections" class="info" />
+        <label class="imglabel floatLeft">Est Time Left:</label>
+        <label id="remaining_time" class="info" />
+    </div>
+    <br>
+    <hr>
+    <div class="inline">
+        <label class="stdlabel floatLeft">Image Files:</label>
+        <span class="ui-icon icon_geof_discard iconRight" id="btnDeleteImageFile" title="Delete Image File"></span>
+    </div>
+
+    <div class="imageFileList">
+        <div class="list_header2">
+            <label class="hdrLabelLeft flw200">Name</label>
+            <label class="hdrLabelRight mr20">Size</label>
+        </div>
+        <div class="" id="pnl_listBlock" >
+            <ol id="olImageFiles" class="OlStdSelect2"></ol>
+        </div>
+    </div>
+
+</div>

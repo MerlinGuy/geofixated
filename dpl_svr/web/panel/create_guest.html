@@ -1,0 +1,37 @@
+<div id="create_guest"  title="Create Guest" class="hidden font12">
+    <div class="buttonBar" >
+        <label class="stdlabel flw130">Source Domain:</label>
+        <label class="dataDisplay flw130" id="source_domain"></label>
+        <span class="ui-icon icon_geof_build iconRight2R" id="btnCreateGuest" title="Create Guest"></span>
+    </div>
+
+    <div class="inline3">
+        <label class="stdlabel flw130">New Domain Name:</label>
+        <input type="text" spellcheck="false" id="newGuestName" size="30" >
+    </div>
+    <div class="shortList2">
+        <div class="list_header">
+            <label class="hdrLabelLeft flw120">IP addr</label>
+            <label class="hdrLabelLeft flw90">Mac addr</label>
+            <label class="hdrLabelRight mr14">Domain</label>
+        </div>
+        <ol id="olMacip" class="OlShortList2"></ol>
+    </div>
+    <div class="inline3 mt8">
+        <label class="stdlabel">Start Date:</label>
+        <input type="text" id="guest_startdate" size="12" >
+        <label class="stdlabel">End Date:</label>
+        <input type="text" id="guest_enddate" size="12" >
+    </div>
+    <div class="inline4">
+        <label><input type="checkbox" id="connectGuest" value="true" checked>Connect to Guest</label>
+    </div>
+    <div class="inline4">
+        <label><input type="checkbox" id="overwriteGuest" value="true" checked>Overwrite Guest if existing</label>
+    </div>
+    <div class="inline4">
+        <label><input type="checkbox" id="showdownSource" value="true" checked>Shutdown source prior to cloning</label>
+    </div>
+    <hr>
+    <div id="create_guest_progress"></div>
+</div>

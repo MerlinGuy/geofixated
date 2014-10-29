@@ -1,0 +1,13 @@
+openjdk-7-jre
+python-software-properties
+#wget
+#apache2
+tomcat6
+postgresql-9.1
+postgis
+postgresql-9.1-postgis
+
+
+
+
+
